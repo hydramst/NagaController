@@ -20,6 +20,7 @@ final class MappingViewController: NSViewController {
     private var container: NSStackView!
     private var topConstraint: NSLayoutConstraint?
     private var backgroundGradient: CAGradientLayer?
+    private var profileObserver: NSObjectProtocol?
 
     override func loadView() {
         self.view = NSView()
@@ -164,6 +165,20 @@ final class MappingViewController: NSViewController {
         topConstraint?.isActive = true
 
         refreshRows()
+
+        profileObserver = NotificationCenter.default.addObserver(
+            forName: ConfigManager.profileDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.refreshRows()
+        }
+    }
+
+    deinit {
+        if let profileObserver {
+            NotificationCenter.default.removeObserver(profileObserver)
+        }
     }
 
     override func viewDidAppear() {
