@@ -82,7 +82,12 @@ final class ButtonMapper {
         case .macro(let steps, _):
             runMacro(steps)
         case .profileSwitch(let profile, _):
-            NSLog("[Mapping] Switch to profile: \(profile) (not implemented)")
+            // Profile changes update the active mapping immediately. Keep the
+            // mutation on the main queue because UI observers refresh the
+            // profile selector and mapping cards in response.
+            DispatchQueue.main.async {
+                ConfigManager.shared.setCurrentProfile(profile)
+            }
         }
     }
 
